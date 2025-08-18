@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # llm_route_planner.py
 
 import json
@@ -163,6 +164,8 @@ def get_optimal_route_plan(db: Session):
 
     return route_plan
 =======
+=======
+>>>>>>> 6eac44bc5c4d95845f67e40b07c880e4888b0f88
 # llm_route_planner.py
 
 import json
@@ -326,4 +329,7 @@ def get_optimal_route_plan(db: Session):
     print("Shipment records updated and committed to DB")
 
     return route_plan
+<<<<<<< HEAD
 >>>>>>> 6eac44b (Add project files)
+=======
+>>>>>>> 6eac44bc5c4d95845f67e40b07c880e4888b0f88

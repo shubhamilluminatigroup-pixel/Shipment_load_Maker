@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # shipment_delay_checker.py
 
 import json
@@ -118,6 +119,8 @@ def assess_shipment_delays(db: Session):
     print("🎯 All shipments processed.")
     return results
 =======
+=======
+>>>>>>> 6eac44bc5c4d95845f67e40b07c880e4888b0f88
 # shipment_delay_checker.py
 
 import json
@@ -236,4 +239,7 @@ def assess_shipment_delays(db: Session):
 
     print("🎯 All shipments processed.")
     return results
+<<<<<<< HEAD
 >>>>>>> 6eac44b (Add project files)
+=======
+>>>>>>> 6eac44bc5c4d95845f67e40b07c880e4888b0f88

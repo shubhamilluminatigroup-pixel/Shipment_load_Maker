@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # utils/geocoder.py
 
 import requests
@@ -24,6 +25,8 @@ def get_coordinates_from_address(address_dict):
         print(f"Error getting coordinates: {e}")
         return None
 =======
+=======
+>>>>>>> 6eac44bc5c4d95845f67e40b07c880e4888b0f88
 # utils/geocoder.py
 
 import requests
@@ -48,4 +51,7 @@ def get_coordinates_from_address(address_dict):
     except requests.RequestException as e:
         print(f"Error getting coordinates: {e}")
         return None
+<<<<<<< HEAD
 >>>>>>> 6eac44b (Add project files)
+=======
+>>>>>>> 6eac44bc5c4d95845f67e40b07c880e4888b0f88
