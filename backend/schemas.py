@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Literal
 from datetime import date, datetime
 from uuid import UUID
+from typing import List, Union
+
 
 
 class Address(BaseModel):
@@ -57,6 +59,8 @@ class Shipment(BaseModel):
     origin_lng: Optional[float] = None
     destination_lat: Optional[float] = None
     destination_lng: Optional[float] = None
+    regulatory_flags: Union[List[str], str, None] = Field(default_factory=list)
+    vehicle_id: Optional[str] = None
     class Config:
         orm_mode = True
 

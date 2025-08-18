@@ -12,6 +12,8 @@ function App() {
     shelf_life_days: 0.5,
     days_to_delivery: 0.5,
   });
+  const [routes, setRoutes] = useState(null);
+  const [delays, setDelays] = useState(null);
 
   const fetchShipments = () => {
     setLoading(true);
@@ -63,6 +65,39 @@ function App() {
     });
 };
 
+  const handleOptimizeRoutes = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:8000/optimize-routes/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await response.json();
+      setRoutes(data.optimized_routes);
+    } catch (error) {
+      console.error("Error optimizing routes:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCheckDelays = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:8000/delay/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await response.json();
+      setDelays(data.shipment_delays);
+      fetchShipments(); // ✅ refresh after checking delays
+
+    } catch (error) {
+      console.error("Error checking delays:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setWeights((prev) => ({
@@ -124,6 +159,18 @@ function App() {
           >
             {loading ? "Loading..." : "Fetch Coordinates"}
           </button>
+          <button
+            onClick={handleOptimizeRoutes}
+            className="bg-teal-600 hover:bg-teal-700 text-black font-semibold px-6 py-2 rounded shadow"
+          >
+            {loading ? "Optimizing..." : "Optimize Routes"}
+          </button>
+          <button
+            onClick={handleCheckDelays}
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded shadow"
+          >
+            {loading ? "Checking..." : "Check Delays"}
+          </button>   
         </div>
 
         <div className="overflow-x-auto shadow-lg rounded-xl border border-gray-200 bg-white">
@@ -143,6 +190,10 @@ function App() {
                 <th className="px-4 py-3 text-left">Origin Longitude</th>
                 <th className="px-4 py-3 text-left">Destination Latitude</th>
                 <th className="px-4 py-3 text-left">Destination Longitude</th>
+                <th className="px-4 py-3 text-left">Regulatory Flags</th>
+                <th className="px-4 py-3 text-left">Origin</th>
+                <th className="px-4 py-3 text-left">Destination</th>
+                <th className="px-4 py-3 text-left">vehicle</th>
               </tr>
             </thead>
             <tbody>
@@ -198,7 +249,22 @@ function App() {
                       {shipment.destination_lng
                         ? shipment.destination_lng.toFixed(4)
                         : "N/A"}
-                    </td>          
+                    </td>  
+                    <td className="px-4 py-3">
+                        {Array.isArray(shipment.regulatory_flags)
+                        ? shipment.regulatory_flags.join(", ")
+                        : shipment.regulatory_flags || "N/A"}
+                    </td>
+                    <td className="px-4 py-3">
+                      {shipment.origin_address?.city || "N/A"}
+                    </td>
+                    <td className="px-4 py-3">
+                      {shipment.destination_address?.city || "N/A"}
+                    </td>
+                    <td className="px-4 py-3">
+                      {shipment.vehicle_id || "N/A"}
+                    </td>   
+                   
                   </tr>
                 ))
               )}
