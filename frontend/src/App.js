@@ -195,7 +195,7 @@ function App() {
                 <th className="px-4 py-3 text-left">Origin Longitude</th>
                 <th className="px-4 py-3 text-left">Destination Latitude</th>
                 <th className="px-4 py-3 text-left">Destination Longitude</th>
-                <th className="px-4 py-3 text-left">Regulatory Flags</th>
+                <th className="px-4 py-3 text-left">Delay analysis</th>
                 <th className="px-4 py-3 text-left">Origin</th>
                 <th className="px-4 py-3 text-left">Destination</th>
                 <th className="px-4 py-3 text-left">vehicle</th>
