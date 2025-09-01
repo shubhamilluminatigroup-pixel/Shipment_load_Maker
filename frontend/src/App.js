@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+// Get the API base URL from an environment variable.
+// In development, this will be defined in a .env file.
+// On Vercel, this will be a variable set in the dashboard.
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function App() {
   const [shipments, setShipments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,7 +23,7 @@ function App() {
   const fetchShipments = () => {
     setLoading(true);
     axios
-      .get("http://127.0.0.1:8000/shipments/")
+      .get(`${API_BASE_URL}/shipments/`)
       .then((response) => {
         setShipments(response.data);
       })
@@ -33,7 +38,7 @@ function App() {
   const recalculateScores = () => {
     setRecalculating(true);
     axios
-      .post("http://localhost:8000/shipments/score/")
+      .post(`${API_BASE_URL}/shipments/score/`)
       .then(() => fetchShipments())
       .catch((error) => {
         console.error("Error recalculating scores:", error);
@@ -45,7 +50,7 @@ function App() {
 
   const updateWeights = () => {
     axios
-      .post("http://localhost:8000/weights/fixed/", weights)
+      .post(`${API_BASE_URL}/weights/fixed/`, weights)
       .then(() => alert("Weights updated successfully!"))
       .catch((error) => {
         console.error("Error updating weights:", error);
@@ -53,22 +58,22 @@ function App() {
   };
 
   const fetchCoordinates = () => {
-  setLoading(true);
-  axios
-    .post("http://localhost:8000/shipments/fill")
-    .then(() => fetchShipments())
-    .catch((error) => {
-      console.error("Error fetching coordinates:", error);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-};
+    setLoading(true);
+    axios
+      .post(`${API_BASE_URL}/shipments/fill`)
+      .then(() => fetchShipments())
+      .catch((error) => {
+        console.error("Error fetching coordinates:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   const handleOptimizeRoutes = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/optimize-routes/", {
+      const response = await fetch(`${API_BASE_URL}/optimize-routes/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       });
@@ -84,20 +89,20 @@ function App() {
   const handleCheckDelays = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/delay/", {
+      const response = await fetch(`${API_BASE_URL}/delay/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       });
       const data = await response.json();
       setDelays(data.shipment_delays);
       fetchShipments(); // ✅ refresh after checking delays
-
     } catch (error) {
       console.error("Error checking delays:", error);
     } finally {
       setLoading(false);
     }
   };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setWeights((prev) => ({
@@ -170,7 +175,7 @@ function App() {
             className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded shadow"
           >
             {loading ? "Checking..." : "Check Delays"}
-          </button>   
+          </button>
         </div>
 
         <div className="overflow-x-auto shadow-lg rounded-xl border border-gray-200 bg-white">
@@ -243,13 +248,13 @@ function App() {
                     <td className="px-4 py-3">
                       {shipment.destination_lat
                         ? shipment.destination_lat.toFixed(4)
-                        : "N/A"}  
+                        : "N/A"}
                     </td>
                     <td className="px-4 py-3">
                       {shipment.destination_lng
                         ? shipment.destination_lng.toFixed(4)
                         : "N/A"}
-                    </td>  
+                    </td>
                     <td className="px-4 py-3">
                         {Array.isArray(shipment.regulatory_flags)
                         ? shipment.regulatory_flags.join(", ")
@@ -263,8 +268,7 @@ function App() {
                     </td>
                     <td className="px-4 py-3">
                       {shipment.vehicle_id || "N/A"}
-                    </td>   
-                   
+                    </td>
                   </tr>
                 ))
               )}
