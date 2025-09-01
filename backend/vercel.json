@@ -11,9 +11,5 @@
       "src": "/api/(.*)",
       "dest": "main.py"
     }
-  ],
-  "exclude": [
-    "__pycache__/",
-    "node_modules/"
   ]
 }
