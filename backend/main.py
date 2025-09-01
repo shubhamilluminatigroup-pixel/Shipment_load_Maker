@@ -22,9 +22,6 @@ from shipment_delay_checker import assess_shipment_delays
 
 OPENCAGE_API_KEY = os.getenv("OPENCAGE_API_KEY")
 
-
-#from utils.geocoder import get_coordinates_from_address
-
 from priority_model import calculate_priority_scores
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -35,6 +32,22 @@ models.Base.metadata.create_all(bind=engine)
 
 # Initialize FastAPI
 app = FastAPI()
+
+# --- IMPORTANT ---
+# Configure CORS to allow only your Vercel frontend URL
+# This is a more secure practice than using allow_origins=["*"]
+origins = [
+    "https://shipment-load-maker.vercel.app",
+    "https://shipment-load-maker-khjo.vercel.app" # The URL from your error screenshot
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Dependency to get DB session
 def get_db():
@@ -142,15 +155,6 @@ def calculate_and_update_priority_scores(db: Session = Depends(get_db)):
     db.commit()
     return {"message": f"Updated {len(scores)} shipments with priority scores."}
 
-
-# ✅ Enable CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Use specific origins in production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # cordinate fetch from adress
 
