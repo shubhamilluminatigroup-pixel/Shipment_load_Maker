@@ -31,7 +31,7 @@ const DashboardButtons = ({
       </button>
       <button
         onClick={handleOptimizeRoutes}
-        className="bg-teal-600 hover:bg-teal-700 text-gray-900 font-semibold px-6 py-2 rounded shadow-lg transition duration-300 hover:scale-105 transform focus:outline-none focus:ring focus:ring-teal-500 focus:ring-opacity-50"
+        className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-2 rounded shadow-lg transition duration-300 hover:scale-105 transform focus:outline-none focus:ring focus:ring-teal-500 focus:ring-opacity-50"
       >
         {loading ? "Optimizing..." : "Optimize Routes"}
       </button>
