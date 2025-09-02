@@ -10,7 +10,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function App() {
   const [shipments, setShipments] = useState([]);
-  const [trucks, setTrucks] = useState([]); // New state for truck data
+  const [trucks, setTrucks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [recalculating, setRecalculating] = useState(false);
   const [weights, setWeights] = useState({
@@ -22,7 +22,7 @@ function App() {
   });
   const [routes, setRoutes] = useState(null);
   const [delays, setDelays] = useState(null);
-  const [activeTab, setActiveTab] = useState("shipments"); // New state for active tab
+  const [activeTab, setActiveTab] = useState("shipments");
 
   const fetchShipments = () => {
     setLoading(true);
@@ -131,10 +131,10 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-6">
+    <div className="min-h-screen bg-gray-900 text-gray-200 p-6">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
-          📦 Logistics Dashboard
+        <h1 className="text-3xl font-extrabold text-cyan-400 mb-6 text-center">
+          🚀 Logistics Command Center
         </h1>
 
         <WeightConfig
@@ -153,14 +153,14 @@ function App() {
           handleCheckDelays={handleCheckDelays}
         />
 
-        <div className="mb-6 border-b border-gray-200">
+        <div className="mb-6 border-b border-gray-700">
           <nav className="-mb-px flex space-x-8" aria-label="Tabs">
             <button
               onClick={() => setActiveTab("shipments")}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition duration-300 ${
                 activeTab === "shipments"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  ? "border-cyan-400 text-cyan-400"
+                  : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-500"
               }`}
             >
               Shipments
@@ -168,22 +168,22 @@ function App() {
             <button
               onClick={() => {
                 setActiveTab("trucks");
-                fetchTrucks(); // Fetch truck data when this tab is clicked
+                fetchTrucks();
               }}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition duration-300 ${
                 activeTab === "trucks"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  ? "border-cyan-400 text-cyan-400"
+                  : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-500"
               }`}
             >
               Trucks
             </button>
             <button
               onClick={() => setActiveTab("delays")}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition duration-300 ${
                 activeTab === "delays"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  ? "border-cyan-400 text-cyan-400"
+                  : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-500"
               }`}
             >
               Delayed Shipments
