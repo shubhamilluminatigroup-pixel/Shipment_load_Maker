@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
+import ShipmentsTable from "./components/ShipmentsTable";
+import TrucksTable from "./components/TrucksTable";
+import DashboardButtons from "./components/DashboardButtons";
+import WeightConfig from "./components/WeightConfig";
+import DelayedShipments from "./components/DelayedShipments";
 
-// Get the API base URL from an environment variable.
-// In development, this will be defined in a .env file.
-// On Vercel, this will be a variable set in the dashboard.
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function App() {
   const [shipments, setShipments] = useState([]);
+  const [trucks, setTrucks] = useState([]); // New state for truck data
   const [loading, setLoading] = useState(false);
   const [recalculating, setRecalculating] = useState(false);
   const [weights, setWeights] = useState({
@@ -19,6 +22,7 @@ function App() {
   });
   const [routes, setRoutes] = useState(null);
   const [delays, setDelays] = useState(null);
+  const [activeTab, setActiveTab] = useState("shipments"); // New state for active tab
 
   const fetchShipments = () => {
     setLoading(true);
@@ -29,6 +33,21 @@ function App() {
       })
       .catch((error) => {
         console.error("Error fetching shipments:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const fetchTrucks = () => {
+    setLoading(true);
+    axios
+      .get(`${API_BASE_URL}/trucks/`)
+      .then((response) => {
+        setTrucks(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching trucks:", error);
       })
       .finally(() => {
         setLoading(false);
@@ -95,7 +114,7 @@ function App() {
       });
       const data = await response.json();
       setDelays(data.shipment_delays);
-      fetchShipments(); // ✅ refresh after checking delays
+      fetchShipments();
     } catch (error) {
       console.error("Error checking delays:", error);
     } finally {
@@ -115,166 +134,66 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-6">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
-          📦 Shipment Dashboard
+          📦 Logistics Dashboard
         </h1>
 
-        {/* Weight Config Inputs */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-          {["value", "weight", "volume", "shelf_life_days", "days_to_delivery"].map((field) => (
-            <div key={field}>
-              <label className="block text-sm font-semibold text-gray-700 mb-1 capitalize">
-                {field.replace(/_/g, " ")}
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="1"
-                name={field}
-                value={weights[field]}
-                onChange={handleInputChange}
-                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
-              />
-            </div>
-          ))}
+        <WeightConfig
+          weights={weights}
+          handleInputChange={handleInputChange}
+          updateWeights={updateWeights}
+        />
+
+        <DashboardButtons
+          loading={loading}
+          recalculating={recalculating}
+          fetchShipments={fetchShipments}
+          recalculateScores={recalculateScores}
+          fetchCoordinates={fetchCoordinates}
+          handleOptimizeRoutes={handleOptimizeRoutes}
+          handleCheckDelays={handleCheckDelays}
+        />
+
+        <div className="mb-6 border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab("shipments")}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "shipments"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              Shipments
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab("trucks");
+                fetchTrucks(); // Fetch truck data when this tab is clicked
+              }}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "trucks"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              Trucks
+            </button>
+            <button
+              onClick={() => setActiveTab("delays")}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "delays"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              Delayed Shipments
+            </button>
+          </nav>
         </div>
 
-        <div className="flex justify-center space-x-4 mb-6">
-          <button
-            onClick={updateWeights}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded shadow"
-          >
-            Update Weights
-          </button>
-          <button
-            onClick={fetchShipments}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow"
-          >
-            {loading ? "Loading..." : "Fetch Shipments"}
-          </button>
-          <button
-            onClick={recalculateScores}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded shadow"
-          >
-            {recalculating ? "Recalculating..." : "Recalculate Scores"}
-          </button>
-          <button
-            onClick={fetchCoordinates}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2 rounded shadow"
-          >
-            {loading ? "Loading..." : "Fetch Coordinates"}
-          </button>
-          <button
-            onClick={handleOptimizeRoutes}
-            className="bg-teal-600 hover:bg-teal-700 text-black font-semibold px-6 py-2 rounded shadow"
-          >
-            {loading ? "Optimizing..." : "Optimize Routes"}
-          </button>
-          <button
-            onClick={handleCheckDelays}
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded shadow"
-          >
-            {loading ? "Checking..." : "Check Delays"}
-          </button>
-        </div>
-
-        <div className="overflow-x-auto shadow-lg rounded-xl border border-gray-200 bg-white">
-          <table className="min-w-full text-sm text-gray-700">
-            <thead className="bg-blue-100 text-gray-900">
-              <tr>
-                <th className="px-4 py-3 text-left">Shipment ID</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-left">Priority Score</th>
-                <th className="px-4 py-3 text-left">Created At</th>
-                <th className="px-4 py-3 text-left">Updated At</th>
-                <th className="px-4 py-3 text-left">Shelf Life</th>
-                <th className="px-4 py-3 text-left">Volume</th>
-                <th className="px-4 py-3 text-left">Weight</th>
-                <th className="px-4 py-3 text-left">Value</th>
-                <th className="px-4 py-3 text-left">Origin Latititude</th>
-                <th className="px-4 py-3 text-left">Origin Longitude</th>
-                <th className="px-4 py-3 text-left">Destination Latitude</th>
-                <th className="px-4 py-3 text-left">Destination Longitude</th>
-                <th className="px-4 py-3 text-left">Delay analysis</th>
-                <th className="px-4 py-3 text-left">Origin</th>
-                <th className="px-4 py-3 text-left">Destination</th>
-                <th className="px-4 py-3 text-left">vehicle</th>
-              </tr>
-            </thead>
-            <tbody>
-              {shipments.length === 0 ? (
-                <tr>
-                  <td colSpan="9" className="text-center py-6 text-gray-500">
-                    No shipments available.
-                  </td>
-                </tr>
-              ) : (
-                shipments.map((shipment, index) => (
-                  <tr
-                    key={index}
-                    className={
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50 hover:bg-blue-50"
-                    }
-                  >
-                    <td className="px-4 py-3 font-mono">{shipment.shipment_id}</td>
-                    <td className="px-4 py-3">{shipment.shipment_status}</td>
-                    <td className="px-4 py-3">
-                      {shipment.priority_score != null
-                        ? shipment.priority_score.toFixed(2)
-                        : "N/A"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {new Date(shipment.created_at).toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3">
-                      {new Date(shipment.updated_at).toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3">{shipment.shelf_life_days} days</td>
-                    <td className="px-4 py-3">
-                      {shipment.volume ? shipment.volume.toFixed(2) : "N/A"} m³
-                    </td>
-                    <td className="px-4 py-3">
-                      {shipment.weight ? shipment.weight.toFixed(2) : "N/A"} kg
-                    </td>
-                    <td className="px-4 py-3">
-                      {shipment.value ? shipment.value.toFixed(2) : "N/A"} $
-                    </td>
-                    <td className="px-4 py-3">
-                      {shipment.origin_lat ? shipment.origin_lat.toFixed(4) : "N/A"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {shipment.origin_lng ? shipment.origin_lng.toFixed(4) : "N/A"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {shipment.destination_lat
-                        ? shipment.destination_lat.toFixed(4)
-                        : "N/A"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {shipment.destination_lng
-                        ? shipment.destination_lng.toFixed(4)
-                        : "N/A"}
-                    </td>
-                    <td className="px-4 py-3">
-                        {Array.isArray(shipment.regulatory_flags)
-                        ? shipment.regulatory_flags.join(", ")
-                        : shipment.regulatory_flags || "N/A"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {shipment.origin_address?.city || "N/A"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {shipment.destination_address?.city || "N/A"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {shipment.vehicle_id || "N/A"}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        {activeTab === "shipments" && <ShipmentsTable shipments={shipments} />}
+        {activeTab === "trucks" && <TrucksTable trucks={trucks} loading={loading} />}
+        {activeTab === "delays" && <DelayedShipments delays={delays} />}
       </div>
     </div>
   );
